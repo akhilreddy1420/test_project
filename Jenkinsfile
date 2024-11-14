@@ -33,14 +33,9 @@ pipeline {
             steps {
                 script {
                     sh """
-                        scp index.html ${REMOTE_USER}@${REMOTE_SERVER}:/var/www/html/
-                    """
-                    
-                    sh """
-                        ssh ${REMOTE_USER}@${REMOTE_SERVER} '
-                            sudo chmod -R 755 /var/www/html/ &&
+                            cp index.html /var/www/html/ && sudo chmod -R 755 /var/www/html/ &&
                             sudo systemctl restart apache2
-                        '
+                        
                     """
                 }
             }
@@ -50,9 +45,8 @@ pipeline {
             steps {
                 script {
                     sh """
-                        ssh ${REMOTE_USER}@${REMOTE_SERVER} '
                             sudo systemctl status apache2
-                        '
+
                     """
                 }
             }
@@ -65,7 +59,6 @@ pipeline {
         }
         failure {
             echo 'Deployment or analysis failed! Restoring backup...'
-            sh 'ssh ${REMOTE_USER}@${REMOTE_SERVER} "sudo cp -r /var/www/html_backup/* /var/www/html/ || true"'
         }
     }
 }
