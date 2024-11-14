@@ -1,6 +1,11 @@
 pipeline {
     agent any
-    
+
+    environment {
+        REMOTE_SERVER = '132.145.193.30'  
+        REMOTE_USER = 'ubuntu'             
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -23,29 +28,48 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Deploy to Apache') {
             steps {
                 script {
-                    sh 'sudo cp -r /var/www/html /var/www/html_backup || true'
+                    sh 'ssh ${REMOTE_USER}@${REMOTE_SERVER} "sudo cp -r /var/www/html /var/www/html_backup || true"'
+
+                    sh """
+                        scp -r * ${REMOTE_USER}@${REMOTE_SERVER}:/var/www/html/
+                    """
                     
-                    sh '''
-                        sudo rm -rf /var/www/html/*
-                        sudo cp -r * /var/www/html/
-                        sudo chmod -R 755 /var/www/html
-                    '''
+                    sh """
+                        ssh ${REMOTE_USER}@${REMOTE_SERVER} '
+                            sudo chown -R www-data:www-data /var/www/html/ &&
+                            sudo chmod -R 755 /var/www/html/ &&
+                            sudo systemctl restart apache2
+                        '
+                    """
+                }
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                script {
+                    sh """
+                        ssh ${REMOTE_USER}@${REMOTE_SERVER} '
+                            sudo systemctl status apache2
+                        '
+                    """
                 }
             }
         }
     }
-    
+
     post {
         success {
-            echo 'Deployment successful!'
+            echo 'Deployment and analysis were successful!'
         }
         failure {
-            echo 'Deployment failed!'
-            sh 'sudo cp -r /var/www/html_backup/* /var/www/html/ || true'
+            echo 'Deployment or analysis failed! Restoring backup...'
+            sh 'ssh ${REMOTE_USER}@${REMOTE_SERVER} "sudo cp -r /var/www/html_backup/* /var/www/html/ || true"'
         }
     }
 }
+
