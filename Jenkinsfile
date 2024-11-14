@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'YOUR_GITHUB_REPO_URL'
+                git branch: 'main', url: 'https://github.com/akhilreddy1420/test_project.git'
             }
         }
         
@@ -17,7 +17,7 @@ pipeline {
                             ${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=my-website \
                             -Dsonar.sources=. \
-                            -Dsonar.host.url=http://localhost:9000
+                            -Dsonar.host.url=http://132.145.193.30:9000
                         """
                     }
                 }
@@ -27,14 +27,11 @@ pipeline {
         stage('Deploy to Apache') {
             steps {
                 script {
-                    // Backup existing files
                     sh 'sudo cp -r /var/www/html /var/www/html_backup || true'
                     
-                    // Deploy new files
                     sh '''
                         sudo rm -rf /var/www/html/*
                         sudo cp -r * /var/www/html/
-                        sudo chown -R www-data:www-data /var/www/html
                         sudo chmod -R 755 /var/www/html
                     '''
                 }
