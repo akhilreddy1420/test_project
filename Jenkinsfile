@@ -32,15 +32,12 @@ pipeline {
         stage('Deploy to Apache') {
             steps {
                 script {
-                    sh 'ssh ${REMOTE_USER}@${REMOTE_SERVER} "sudo cp -r /var/www/html /var/www/html_backup || true"'
-
                     sh """
-                        scp -r * ${REMOTE_USER}@${REMOTE_SERVER}:/var/www/html/
+                        scp index.html ${REMOTE_USER}@${REMOTE_SERVER}:/var/www/html/
                     """
                     
                     sh """
                         ssh ${REMOTE_USER}@${REMOTE_SERVER} '
-                            sudo chown -R www-data:www-data /var/www/html/ &&
                             sudo chmod -R 755 /var/www/html/ &&
                             sudo systemctl restart apache2
                         '
