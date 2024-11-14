@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+     agent { label 'linux' }
 
     environment {
         REMOTE_SERVER = '132.145.193.30'  
