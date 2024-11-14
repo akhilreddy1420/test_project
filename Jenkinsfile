@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         REMOTE_SERVER = '132.145.193.30'  
-        REMOTE_USER = 'ubuntu'             
+        REMOTE_USER = 'root'             
     }
 
     stages {
