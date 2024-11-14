@@ -23,8 +23,6 @@ pipeline {
                             -Dsonar.projectKey=my-website \
                             -Dsonar.sources=. \
                             -Dsonar.host.url=http://132.145.193.30:9000
-                            -Dsonar.login=admin \
-                            -Dsonar.password=admin@123
                         """
                     }
                 }
